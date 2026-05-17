@@ -90,6 +90,10 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ comment })
   }),
+  updateCheckIn: (period: string, goalId: number, payload: any) => fetchApi(`/goal-sheets/me/check-ins/${period}/${goalId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  }),
   getCompletionDashboard: (period: string) => fetchApi(`/dashboard/completion?period=${period}`),
   // Admin
   upsertUser: (payload: any) => fetchApi('/admin/users', {

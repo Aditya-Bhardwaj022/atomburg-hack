@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api, setActorId, getActorId } from './api';
+import { api, setActorId } from './api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
@@ -1142,7 +1142,7 @@ function App() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {goalSheet.goals?.map((goal: any, idx: number) => (
+                          {goalSheet.goals?.map((goal: any) => (
                             <TableRow key={goal.id} className="hover:bg-zinc-50 transition-colors border-zinc-100 group">
                               <TableCell className="font-bold text-zinc-900">{goal.title}</TableCell>
                               <TableCell className="text-zinc-600 font-medium">
