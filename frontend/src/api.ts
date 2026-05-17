@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = rawApiBaseUrl.endsWith('/') ? rawApiBaseUrl.slice(0, -1) : rawApiBaseUrl;
 
 let currentActorId = localStorage.getItem('actorId') || 'emp-4';
 
@@ -36,7 +37,8 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(data?.message || data || 'An error occurred');
+    const errorMsg = data?.message || data?.detail || data?.error || (typeof data === 'string' ? data : `HTTP ${response.status} Error`);
+    throw new Error(errorMsg);
   }
 
   return data;
@@ -53,7 +55,7 @@ export const api = {
       body: JSON.stringify({ username, password })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Login failed');
+    if (!response.ok) throw new Error(data.message || data.detail || data.error || `HTTP ${response.status} Login failed`);
     return data;
   },
   getUsers: () => fetchApi('/users'),
