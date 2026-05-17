@@ -1,5 +1,21 @@
-const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-const API_BASE_URL = rawApiBaseUrl.endsWith('/') ? rawApiBaseUrl.slice(0, -1) : rawApiBaseUrl;
+const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+let API_BASE_URL = rawApiBaseUrl.trim();
+
+if (!API_BASE_URL) {
+  // Default fallback for development or local relative requests
+  API_BASE_URL = '/api';
+} else {
+  // Remove trailing slash if any
+  if (API_BASE_URL.endsWith('/')) {
+    API_BASE_URL = API_BASE_URL.slice(0, -1);
+  }
+  // Ensure that if it is an absolute URL (starts with http) it ends with '/api' to match Spring Boot routes
+  if (API_BASE_URL.startsWith('http') && !API_BASE_URL.endsWith('/api')) {
+    API_BASE_URL = `${API_BASE_URL}/api`;
+  }
+}
+
+console.log('Resolved API_BASE_URL to:', API_BASE_URL);
 
 let currentActorId = localStorage.getItem('actorId') || 'emp-4';
 
