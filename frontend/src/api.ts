@@ -47,7 +47,7 @@ export const api = {
   // Session / Users
   login: async (username: string, password?: string) => {
     // Explicitly don't use fetchApi because we don't want to send default actorId
-    const response = await fetch(`/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
