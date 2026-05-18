@@ -1064,7 +1064,7 @@ function App() {
                           <div className="grid grid-cols-2 gap-5">
                             <div className="grid gap-2">
                               <Label htmlFor="targetValueFirst" className="font-semibold">Target Value</Label>
-                              <Input id="targetValueFirst" placeholder="e.g. 95" value={newGoal.targetValue} onChange={(e) => setNewGoal({...newGoal, targetValue: e.target.value})} className="focus-visible:ring-zinc-900" />
+                              <Input id="targetValueFirst" placeholder="e.g. 95% or 100ms" value={newGoal.targetValue} onChange={(e) => setNewGoal({...newGoal, targetValue: e.target.value})} className="focus-visible:ring-zinc-900" />
                             </div>
                             <div className="grid gap-2">
                               <Label htmlFor="weightageFirst" className="font-semibold">Weightage %</Label>
@@ -1106,7 +1106,7 @@ function App() {
                               <div className="grid grid-cols-2 gap-5">
                                 <div className="grid gap-2">
                                   <Label htmlFor="targetValue" className="font-semibold">Target Value</Label>
-                                  <Input id="targetValue" placeholder="e.g. 95" value={newGoal.targetValue} onChange={(e) => setNewGoal({...newGoal, targetValue: e.target.value})} className="focus-visible:ring-zinc-900" />
+                                  <Input id="targetValue" placeholder="e.g. 95% or 100ms" value={newGoal.targetValue} onChange={(e) => setNewGoal({...newGoal, targetValue: e.target.value})} className="focus-visible:ring-zinc-900" />
                                 </div>
                                 <div className="grid gap-2">
                                   <Label htmlFor="weightage" className="font-semibold">Weightage %</Label>
@@ -1236,10 +1236,10 @@ function App() {
                             <TableCell className="font-mono bg-zinc-50 rounded px-2 m-2">{goal.targetValue}</TableCell>
                             <TableCell>
                               <Input 
-                                placeholder="Actual" 
+                                placeholder="e.g. 95%" 
                                 value={form.actualValue} 
                                 onChange={(e) => setCheckInForms({...checkInForms, [goal.id]: {...form, actualValue: e.target.value}})}
-                                className="w-24 focus-visible:ring-zinc-900 bg-white"
+                                className="w-32 focus-visible:ring-zinc-900 bg-white"
                               />
                             </TableCell>
                             <TableCell>
@@ -1361,7 +1361,7 @@ function App() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="sharedTargetValue" className="font-semibold text-sm">Target Value</Label>
-                    <Input id="sharedTargetValue" placeholder="e.g. 100" value={sharedGoal.targetValue} onChange={(e) => setSharedGoal({...sharedGoal, targetValue: e.target.value})} />
+                    <Input id="sharedTargetValue" placeholder="e.g. 100% or 10 units" value={sharedGoal.targetValue} onChange={(e) => setSharedGoal({...sharedGoal, targetValue: e.target.value})} />
                   </div>
                 </div>
               </div>

@@ -1253,9 +1253,12 @@ public class GoalPortalService {
     }
 
     private void validateDecimal(String value, String message) {
-        try {
-            new BigDecimal(value.trim());
-        } catch (NumberFormatException exception) {
+        if (value == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, message);
+        }
+        String clean = value.trim();
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("[0-9]");
+        if (!pattern.matcher(clean).find()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, message);
         }
     }

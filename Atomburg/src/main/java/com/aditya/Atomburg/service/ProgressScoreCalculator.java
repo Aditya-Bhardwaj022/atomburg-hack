@@ -29,12 +29,14 @@ public class ProgressScoreCalculator {
     }
 
     private BigDecimal computeNumericProgress(GoalEntity goal, String actualValue) {
-        BigDecimal target = new BigDecimal(goal.getTargetValue());
-        BigDecimal actual = new BigDecimal(normalize(actualValue));
+        BigDecimal target = parseNumeric(goal.getTargetValue());
+        BigDecimal actual = parseNumeric(actualValue);
+        
+        if (target.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        
         if (goal.getDirection() == GoalDirection.HIGHER_IS_BETTER) {
-            if (target.compareTo(BigDecimal.ZERO) == 0) {
-                return BigDecimal.ZERO;
-            }
             return actual.divide(target, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100))
                     .setScale(2, RoundingMode.HALF_UP);
@@ -45,6 +47,21 @@ public class ProgressScoreCalculator {
         return target.divide(actual, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100))
                 .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal parseNumeric(String raw) {
+        if (raw == null) return BigDecimal.ZERO;
+        String clean = raw.trim();
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("[-+]?[0-9]+(?:\\.[0-9]+)?");
+        java.util.regex.Matcher matcher = pattern.matcher(clean);
+        if (matcher.find()) {
+            try {
+                return new BigDecimal(matcher.group());
+            } catch (NumberFormatException e) {
+                return BigDecimal.ZERO;
+            }
+        }
+        return BigDecimal.ZERO;
     }
 
     private BigDecimal computeTimelineProgress(GoalEntity goal, LocalDate actualDate, GoalStatus status) {
