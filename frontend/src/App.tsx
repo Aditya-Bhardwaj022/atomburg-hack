@@ -61,6 +61,7 @@ function App() {
   const [isFeedbackDismissed, setIsFeedbackDismissed] = useState(false);
   const [selectedEmployeeSheet, setSelectedEmployeeSheet] = useState<any>(null);
   const [managerCommentForm, setManagerCommentForm] = useState('');
+  const [isInspectModalOpen, setIsInspectModalOpen] = useState(false);
 
   const [newGoal, setNewGoal] = useState({
     thrustArea: '',
@@ -239,6 +240,16 @@ function App() {
       }
       setManagerCommentForm(initialComment);
       setIsReviewModalOpen(true);
+    } catch (e: any) {
+      alert(e.message || e);
+    }
+  };
+
+  const handleInspectGoals = async (employeeId: string) => {
+    try {
+      const sheet = await api.getEmployeeGoalSheet(employeeId);
+      setSelectedEmployeeSheet(sheet);
+      setIsInspectModalOpen(true);
     } catch (e: any) {
       alert(e.message || e);
     }
@@ -619,32 +630,49 @@ function App() {
                     </CardContent>
                     <CardFooter className="bg-zinc-50 border-t pt-4">
                       {member.status === 'SUBMITTED' ? (
-                        <div className="flex w-full gap-2">
-                          <Button className="flex-1 bg-zinc-900 hover:bg-zinc-800 shadow-md group-hover:shadow-lg transition-all" onClick={() => handleApproveSheet(member.employee.id)}>
-                            Approve
-                          </Button>
+                        <div className="flex flex-col w-full gap-2">
                           <Button 
-                            variant="outline" 
-                            className="flex-1 border-destructive text-destructive hover:bg-destructive/10 transition-colors" 
-                            onClick={() => {
-                              setRejectEmployeeId(member.employee.id);
-                              setRejectReason('');
-                              setIsRejectModalOpen(true);
-                            }}
+                            className="w-full bg-white border-zinc-200 text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm font-semibold" 
+                            variant="outline"
+                            onClick={() => handleInspectGoals(member.employee.id)}
                           >
-                            Reject
+                            Inspect Goals
                           </Button>
+                          <div className="flex w-full gap-2">
+                            <Button className="flex-1 bg-zinc-900 hover:bg-zinc-800 shadow-md group-hover:shadow-lg transition-all font-semibold text-white" onClick={() => handleApproveSheet(member.employee.id)}>
+                              Approve
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              className="flex-1 border-destructive text-destructive hover:bg-destructive/10 transition-colors font-semibold" 
+                              onClick={() => {
+                                setRejectEmployeeId(member.employee.id);
+                                setRejectReason('');
+                                setIsRejectModalOpen(true);
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </div>
                         </div>
                       ) : member.status === 'APPROVED' ? (
                         <Button 
-                          className="w-full bg-white border-zinc-200 text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm" 
+                          className="w-full bg-white border-zinc-200 text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm font-semibold" 
                           variant="outline"
                           onClick={() => handleReviewPerformance(member.employee.id)}
                         >
                           Review Performance
                         </Button>
+                      ) : member.status === 'RETURNED_FOR_REWORK' ? (
+                        <Button 
+                          className="w-full bg-white border-zinc-200 text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm font-semibold" 
+                          variant="outline"
+                          onClick={() => handleInspectGoals(member.employee.id)}
+                        >
+                          Inspect Rework Goals
+                        </Button>
                       ) : (
-                        <Button className="w-full bg-white border-zinc-200 text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 transition-colors" variant="outline" disabled>
+                        <Button className="w-full bg-white border-zinc-200 text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 transition-colors font-semibold" variant="outline" disabled>
                           Not Submitted
                         </Button>
                       )}
@@ -751,6 +779,97 @@ function App() {
                   <Button onClick={handleSaveManagerComment} className="bg-zinc-900 hover:bg-zinc-800 shadow-md px-6">
                     Submit Official Review
                   </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Manager Inspect Goals Modal */}
+        <Dialog open={isInspectModalOpen} onOpenChange={setIsInspectModalOpen}>
+          <DialogContent className="sm:max-w-[700px] border-zinc-200 p-0 overflow-hidden bg-white flex flex-col max-h-[90vh]">
+            {selectedEmployeeSheet && (
+              <>
+                <div className="bg-zinc-950 p-6 text-white shrink-0">
+                  <DialogTitle className="text-2xl font-bold flex items-center justify-between">
+                    <span>Inspect Goals: {selectedEmployeeSheet.employee.name}</span>
+                    <Badge variant="outline" className="bg-zinc-800 text-white border-zinc-700">
+                      {selectedEmployeeSheet.status.replace(/_/g, ' ')}
+                    </Badge>
+                  </DialogTitle>
+                  <DialogDescription className="text-zinc-400 mt-2">
+                    Review the defined goals, thrust areas, targets, and weightages for the 2026 performance cycle.
+                  </DialogDescription>
+                </div>
+                
+                <div className="overflow-y-auto flex-1 p-6 space-y-6">
+                  <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-sm bg-white">
+                    <Table>
+                      <TableHeader className="bg-zinc-50">
+                        <TableRow className="border-zinc-200">
+                          <TableHead className="font-bold text-zinc-700">Goal Title</TableHead>
+                          <TableHead className="font-bold text-zinc-700">Thrust Area</TableHead>
+                          <TableHead className="font-bold text-zinc-700">Target Value</TableHead>
+                          <TableHead className="text-right font-bold text-zinc-700">Weightage</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedEmployeeSheet.goals && selectedEmployeeSheet.goals.length > 0 ? selectedEmployeeSheet.goals.map((goal: any) => (
+                          <TableRow key={goal.id} className="border-zinc-100 hover:bg-zinc-50">
+                            <TableCell className="font-bold text-zinc-900">{goal.title}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="bg-zinc-100 text-zinc-700">{goal.thrustArea}</Badge>
+                            </TableCell>
+                            <TableCell className="font-mono bg-zinc-50 rounded px-2 m-2">{goal.targetValue || (goal.targetDate ? new Date(goal.targetDate).toLocaleDateString() : '-')}</TableCell>
+                            <TableCell className="text-right font-bold text-zinc-900">{goal.weightage}%</TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center text-zinc-500 py-4">No goals defined yet.</TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-zinc-50 rounded-xl border border-zinc-200">
+                    <span className="font-semibold text-zinc-700">Total Defined Weightage</span>
+                    <span className="font-black text-xl text-zinc-900 bg-white border border-zinc-200 px-3 py-1 rounded-lg">
+                      {selectedEmployeeSheet.totalWeightage}%
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-zinc-50 p-4 border-t border-zinc-200 flex justify-between gap-3 shrink-0">
+                  <Button variant="outline" onClick={() => setIsInspectModalOpen(false)} className="border-zinc-300 hover:bg-zinc-100">
+                    Close Window
+                  </Button>
+                  
+                  {selectedEmployeeSheet.status === 'SUBMITTED' && (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="border-destructive text-destructive hover:bg-destructive/10 transition-colors font-semibold" 
+                        onClick={() => {
+                          setIsInspectModalOpen(false);
+                          setRejectEmployeeId(selectedEmployeeSheet.employee.id);
+                          setRejectReason('');
+                          setIsRejectModalOpen(true);
+                        }}
+                      >
+                        Reject & Return
+                      </Button>
+                      <Button 
+                        className="bg-zinc-900 hover:bg-zinc-800 shadow-md text-white font-semibold"
+                        onClick={async () => {
+                          setIsInspectModalOpen(false);
+                          await handleApproveSheet(selectedEmployeeSheet.employee.id);
+                        }}
+                      >
+                        Approve Goal Sheet
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
