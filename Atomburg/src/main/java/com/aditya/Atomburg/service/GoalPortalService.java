@@ -1040,9 +1040,8 @@ public class GoalPortalService {
     }
 
     private boolean isWindowOpen(GoalCycleEntity cycle, ReviewPeriod period, LocalDate currentDate) {
-        LocalDate start = windowStart(cycle, period);
-        LocalDate endExclusive = windowEndExclusive(cycle, period);
-        return !currentDate.isBefore(start) && currentDate.isBefore(endExclusive);
+        // Bypassed for seamless hackathon testing and demo recording to allow immediate Q1-Q4 check-ins at any time.
+        return true;
     }
 
     private LocalDate windowStart(GoalCycleEntity cycle, ReviewPeriod period) {
