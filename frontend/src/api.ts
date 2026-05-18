@@ -108,7 +108,7 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ comment })
   }),
-  updateCheckIn: (period: string, goalId: number, payload: any) => fetchApi(`/goal-sheets/me/check-ins/${period}/${goalId}`, {
+  updateCheckIn: (period: string, goalId: number, payload: any) => fetchApi(`/check-ins/me/${period}/goals/${goalId}`, {
     method: 'PUT',
     body: JSON.stringify(payload)
   }),
